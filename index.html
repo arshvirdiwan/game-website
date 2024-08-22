@@ -3,183 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoji Memory Game</title>
+    <title>Number Guessing Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
-            background-image: url('https://img.freepik.com/premium-vector/set-emoji-emoticon-character-faces-circle_601748-19399.jpg?w=740');
-            background-size: cover;
-            background-position: center;
+            background-image: url("https://png.pngtree.com/thumb_back/fh260/background/20240105/pngtree-retro-game-arcade-seamless-pattern-of-vintage-video-game-machines-with-image_13912505.png?w=740");
+            background-repeat: no-repeat;
+           background-size: cover;
         }
-        h1 {
-            margin-bottom: 20px;
-            color: black;
-        }
-        .game-info {
-            margin-bottom: 20px;
+        #game-container {
             text-align: center;
-            color: black;
-        }
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 60px);
-            grid-gap: 10px;
-        }
-        .card {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(240, 240, 240, 0.8);
-            cursor: pointer;
-            font-size: 24px;
+            border: 2px solid #ddd;
+            padding: 20px;
             border-radius: 8px;
-            transition: background-color 0.3s ease;
+            background-color: #191736;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .card.flipped {
-            background-color: #f5b905;
+        #feedback {
+            font-size: 1.2em;
+            margin: 20px 0;
         }
-        .hidden {
-            visibility: hidden;
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 100px;
         }
-        .flipped .hidden {
-            visibility: visible;
+        h1{
+            color: white;
         }
-        .controls {
-            margin-top: 20px;
+        p{
+            color: white;
         }
         button {
             padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
+            font-size: 1em;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            margin: 5px;
         }
-        button:hover {
-            background-color: #0056b3;
+        #attempts {
+            margin-top: 20px;
+            font-size: 1.1em;
         }
+        /* styles.css */
+#feedback {
+    font-size: 1.2em;
+    margin: 20px 0;
+    color: white; /* Add this line */
+}
+
+#attempts {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: white; /* Add this line */
+}
     </style>
 </head>
 <body>
-    <h1>Emoji Memory Game</h1>
-    <div class="game-info">
-        <p>Moves: <span id="moves">0</span></p>
-        <p>Matched Pairs: <span id="matches">0</span>/8</p>
+    <div id="game-container">
+        <h1>Number Guessing Game</h1>
+        <p>Guess a number between 1 and 100</p>
+        <input type="number" id="guess" min="1" max="100" placeholder="Enter your guess">
+        <button id="guess-btn">Guess</button>
+        <button id="reset-btn">Reset Game</button>
+        <div id="feedback"></div>
+        <div id="attempts">Attempts: 0</div>
     </div>
-    <div id="gameBoard" class="game-board"></div>
-    <div class="controls">
-        <button onclick="restartGame()">Restart Game</button>
-    </div>
-
     <script>
-        // Game data
-        const emojis = ['😁', '😆', '🤯', '😶‍🌫️', '👻', '🤠', '🤡', '👽'];
-        let cards = [...emojis, ...emojis];
-        let flippedCards = [];
-        let matchedCards = [];
-        let clickDisabled = false;
-        let moves = 0;
-        let matches = 0;
+        // JavaScript for game logic
 
-        // Create a card element
-        function createCard(emoji) {
-            const card = document.createElement('div');
-            card.classList.add('card');
-            card.innerHTML = `<span class="hidden">${emoji}</span>`;
-            card.addEventListener('click', () => flipCard(card));
-            return card;
-        }
+        // Game state variables
+        let targetNumber;
+        let attempts;
 
-        // Flip a card
-        function flipCard(card) {
-            if (clickDisabled || flippedCards.includes(card) || matchedCards.includes(card)) {
-                return;
-            }
-
-            card.classList.add('flipped');
-            flippedCards.push(card);
-
-            if (flippedCards.length === 2) {
-                checkForMatch();
-                moves++;
-                document.getElementById('moves').textContent = moves;
-            }
-        }
-
-        // Check if two flipped cards match
-        function checkForMatch() {
-            clickDisabled = true;
-            const [card1, card2] = flippedCards;
-            const emoji1 = card1.querySelector('span').textContent;
-            const emoji2 = card2.querySelector('span').textContent;
-
-            if (emoji1 === emoji2) {
-                matchedCards.push(card1, card2);
-                flippedCards = [];
-                matches++;
-                document.getElementById('matches').textContent = matches;
-                clickDisabled = false;
-
-                if (matches === emojis.length) {
-                    setTimeout(() => {
-                        alert('Congratulations! You have matched all pairs!');
-                    }, 500);
-                }
-            } else {
-                setTimeout(() => {
-                    card1.classList.remove('flipped');
-                    card2.classList.remove('flipped');
-                    flippedCards = [];
-                    clickDisabled = false;
-                }, 1000);
-            }
-        }
-
-        // Shuffle array elements
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+        // Elements
+        const feedback = document.getElementById('feedback');
+        const attemptsDisplay = document.getElementById('attempts');
+        const guessInput = document.getElementById('guess');
+        const guessButton = document.getElementById('guess-btn');
+        const resetButton = document.getElementById('reset-btn');
 
         // Initialize the game
         function initializeGame() {
-            const gameBoard = document.getElementById('gameBoard');
-            gameBoard.innerHTML = '';
-            shuffle(cards);
-            cards.forEach(emoji => {
-                const card = createCard(emoji);
-                gameBoard.appendChild(card);
-            });
-
-            moves = 0;
-            matches = 0;
-            flippedCards = [];
-            matchedCards = [];
-            clickDisabled = false;
-            document.getElementById('moves').textContent = moves;
-            document.getElementById('matches').textContent = matches;
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            feedback.textContent = 'Make your guess!';
+            attemptsDisplay.textContent = 'Attempts: 0';
+            guessInput.value = '';
         }
 
-        // Restart the game
-        function restartGame() {
+        // Handle guess
+        function handleGuess() {
+            const guess = parseInt(guessInput.value, 10);
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                feedback.textContent = 'Please enter a number between 1 and 100.';
+                return;
+            }
+
+            attempts++;
+            attemptsDisplay.textContent = `Attempts: ${attempts}`;
+
+            if (guess < targetNumber) {
+                feedback.textContent = 'Too low! Try again.';
+            } else if (guess > targetNumber) {
+                feedback.textContent = 'Too high! Try again.';
+            } else {
+                feedback.textContent = `Congratulations! You guessed the number in ${attempts} attempts.`;
+                guessButton.disabled = true;
+            }
+        }
+
+        // Reset the game
+        function resetGame() {
             initializeGame();
+            guessButton.disabled = false;
         }
 
-        // Start the game initially
+        // Event listeners
+        guessButton.addEventListener('click', handleGuess);
+        resetButton.addEventListener('click', resetGame);
+
+        // Initialize game on page load
         initializeGame();
     </script>
 </body>
 </html>
-
